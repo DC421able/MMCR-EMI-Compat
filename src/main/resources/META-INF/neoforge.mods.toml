@@ -1,0 +1,80 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="mmcr_emi_compat"
+version="1.2.0"
+displayName="MMCR EMI Compat"
+logoFile="mmcr-emi-wordmark.png"
+authors="MMCR EMI Compat contributors"
+description='''
+Compatibility fix for Modular Machinery: Community Refoxed (MMCR) running with EMI.
+Under real JEI nothing changes.
+
+1) Null recipe-slot view
+   EMI bridges JEI plugins through JEMI, and JEMI hands recipe categories a null
+   IRecipeExtrasBuilder#getRecipeSlots() view. MMCR's machine recipe and multiblock structure
+   categories dereference that view unconditionally, raising a NullPointerException on every
+   recipe page ("Exception adding JEMI extras") and dropping the extras they add.
+
+2) Machine recipe categories silently skipped
+   JEMI skips every JEI category whose id namespace belongs to a mod that ships an EMI plugin
+   ("because mod is already handled"). MMCR machine categories are named
+   "<recipe-pool namespace>:recipe_pool/<machine>", and packs normally define recipe pools
+   through KubeJS, so every MMCR machine category was dropped and never showed up in EMI.
+
+3) Structure preview not interactive
+   JEMI collects JEI IJeiInputHandler instances but never uses them, and EMI recipe widgets only
+   expose click/key events. The MMCR multiblock preview therefore could not be rotated or zoomed.
+
+4) Extras widgets misplaced
+   JEMI wraps every IRecipeWidget into a 0x0 drawable anchored at (0,0) and passes page-absolute
+   mouse coordinates, while JEI translates the pose to the widget's own position and passes
+   widget-local coordinates. The MMCR multiblock preview therefore rendered shifted up-left and its
+   layer buttons were clipped.
+
+This mod guards the null recipe-slot view, re-registers the skipped MMCR categories, places extras
+widgets at their declared position/size with JEI-compatible coordinates, and bridges mouse click /
+release / drag / scroll from the EMI recipe screen to the MMCR structure preview.
+'''
+
+[[mixins]]
+config="mmcremi.mixins.json"
+
+[[dependencies.mmcr_emi_compat]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.0,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.mmcr_emi_compat]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.22)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.mmcr_emi_compat]]
+modId="mmcr"
+type="required"
+versionRange="[0.1.0,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.mmcr_emi_compat]]
+modId="emi"
+type="optional"
+versionRange="[1.1.0,)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.mmcr_emi_compat]]
+modId="jei"
+type="optional"
+versionRange="[19,)"
+ordering="NONE"
+side="CLIENT"
+
+
